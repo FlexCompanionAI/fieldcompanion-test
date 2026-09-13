@@ -113,6 +113,8 @@ pre{background:#080d18;border:1px solid var(--line);border-radius:10px;padding:1
       <input type="text" id="new-addr" placeholder="Address or intersection" autocomplete="off">
       <div class="mt"></div>
       <button class="btn big ok" id="btn-start">START CALL</button>
+      <div class="mt"></div>
+      <button class="btn big" id="btn-goto-voice">🎤 VOICE MODE <span class="note" style="color:#fff">hands-free</span></button>
     </div>
     <div class="card">
       <h3>Incident archive <span class="note">(on this device)</span></h3>
@@ -131,6 +133,29 @@ pre{background:#080d18;border:1px solid var(--line);border-radius:10px;padding:1
       <div class="mt"></div>
       <button class="btn ghost" id="btn-save-settings">Save settings</button>
     </div>
+  </div>
+</div>
+
+<!-- ================= VOICE MODE ================= -->
+<div class="screen" id="screen-voice">
+  <div class="hdr"><div class="row">
+    <div><div class="brand">FieldCompanion<span>AI</span></div><div class="cad">VOICE MODE · hands-free</div></div>
+  </div></div>
+  <div class="wrap">
+    <div class="card" style="text-align:center">
+      <button class="btn big ok" id="btn-voice">🎤 START VOICE MODE</button>
+      <p class="note" id="voice-status">Tap to begin hands-free mode. Allow microphone access when asked.</p>
+    </div>
+    <div class="card"><h3>Heard</h3><div id="voice-transcript" class="note" style="min-height:60px">—</div></div>
+    <div class="card"><h3>Voice commands</h3>
+      <ul class="log">
+        <li>“Start call” · “Record patient info” · “Record vitals”</li>
+        <li>“Interventions given” · “Alert dispatch” · “Call fire control”</li>
+        <li>“Read report” · “End call” · “Help” · “Cancel”</li>
+      </ul>
+      <p class="note">Answer each spoken question, then confirm with “yes” or “no”. Say “skip” for optional items.</p>
+    </div>
+    <div class="card"><button class="btn ghost" id="btn-voice-back">← Back</button></div>
   </div>
 </div>
 
@@ -624,6 +649,7 @@ $("btn-back").onclick=()=>show("screen-home");
 loadSettings();renderArchive();
 if(active){openCall();}
 </script>
+<script src="voice.js"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
