@@ -302,6 +302,9 @@ pre{background:#080d18;border:1px solid var(--line);border-radius:10px;padding:1
             <button class="btn sm ghost" id="btn-dl-json">Download JSON</button>
             <button class="btn sm ghost" id="btn-copy">Copy report</button>
           </div>
+          <div class="mt"></div>
+          <button class="btn sm" id="btn-email-eval">EMAIL REPORT FOR EVALUATION</button>
+          <p class="note">Sends this run's data file to Donovan for evaluation. TEST DATA ONLY — no real patient information.</p>
         </div>
       </div>
       <div class="card">
@@ -578,6 +581,23 @@ $("btn-copy").onclick=()=>{
    c.tx.map(t=>`[${t.t}] ${t.label}`).join("\n")+
    (c.narrative?"\nNarrative: "+c.narrative:"");
   navigator.clipboard.writeText(txt).then(()=>alert("Report copied to clipboard."),()=>alert("Copy failed — select the text manually."));
+};
+$("btn-email-eval").onclick=async()=>{
+  const jsonText=$("export-json").textContent;
+  const fname=((active&&active.cadId)||"fieldcompanion")+".nemsis.json";
+  const subject=encodeURIComponent("FieldCompanionAI test report "+((active&&active.cadId)||"")+" — TEST DATA ONLY");
+  try{
+    const files=[new File([jsonText],fname,{type:"application/json"})];
+    if(navigator.canShare&&navigator.canShare({files})){
+      await navigator.share({files:files,title:"FieldCompanionAI test report",text:"TEST DATA ONLY — evaluation report attached."});
+      return;
+    }
+  }catch(e){ if(e&&e.name==="AbortError")return; }
+  const blob=new Blob([jsonText],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  const body=encodeURIComponent("TEST DATA ONLY — no real patient information.\n\nEvaluation report file: "+fname+"\n(Please attach the downloaded JSON file to this email before sending.)");
+  location.href="mailto:flexcompanionai@gmail.com?subject="+subject+"&body="+body;
 };
 $("btn-end").onclick=()=>{
   if(!confirm("End this call and archive it?"))return;
