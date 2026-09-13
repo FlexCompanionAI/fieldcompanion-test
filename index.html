@@ -126,6 +126,8 @@ pre{background:#080d18;border:1px solid var(--line);border-radius:10px;padding:1
       <input type="text" id="set-unit" placeholder="77">
       <label class="lbl">Squad alert numbers <span class="note">(comma separated, for IaR/SMS alerts)</span></label>
       <input type="tel" id="set-numbers" placeholder="+17165550100, +17165550101">
+      <label class="lbl">Fire Control number <span class="note">(one-tap call on the call screen)</span></label>
+      <input type="tel" id="set-firectrl" placeholder="716-648-5111">
       <div class="mt"></div>
       <button class="btn ghost" id="btn-save-settings">Save settings</button>
     </div>
@@ -138,6 +140,7 @@ pre{background:#080d18;border:1px solid var(--line);border-radius:10px;padding:1
     <div><div class="brand">FieldCompanion<span>AI</span></div><div class="cad" id="hdr-cad">—</div></div>
     <div class="timer" id="timer">00:00</div>
   </div></div>
+  <div style="padding:10px 16px 0"><a class="btn warn" id="btn-firectrl" href="tel:+17166485111" style="text-align:center;text-decoration:none">CALL FIRE CONTROL</a></div>
 
   <div class="wrap" style="padding-bottom:90px">
     <!-- PATIENT -->
@@ -335,7 +338,7 @@ pre{background:#080d18;border:1px solid var(--line);border-radius:10px;padding:1
 "use strict";
 /* ============ storage ============ */
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let settings=Object.assign({name:"",unit:"",numbers:""},LS.get("fc_settings",{}));
+let settings=Object.assign({name:"",unit:"",numbers:"",firectrl:"7166485111"},LS.get("fc_settings",{}));
 let active=LS.get("fc_active",null);
 let archive=LS.get("fc_archive",[]);
 let timerInt=null;
@@ -395,14 +398,16 @@ $("btn-start").onclick=()=>{
   save();openCall();
 };
 $("btn-save-settings").onclick=()=>{
-  settings={name:$("set-name").value.trim(),unit:$("set-unit").value.trim(),numbers:$("set-numbers").value.trim()};
-  save();alert("Settings saved.");
+  settings={name:$("set-name").value.trim(),unit:$("set-unit").value.trim(),numbers:$("set-numbers").value.trim(),firectrl:$("set-firectrl").value.replace(/\D/g,"")};
+  save();refreshFireCtrl();alert("Settings saved.");
 };
-function loadSettings(){$("set-name").value=settings.name;$("set-unit").value=settings.unit;$("set-numbers").value=settings.numbers;}
+function loadSettings(){$("set-name").value=settings.name;$("set-unit").value=settings.unit;$("set-numbers").value=settings.numbers;$("set-firectrl").value=settings.firectrl;}
+function refreshFireCtrl(){let d=(settings.firectrl||"").replace(/\D/g,"");if(d.length===10)d="1"+d;$("btn-firectrl").href="tel:+"+(d||"17166485111");}
 
 /* ============ call ============ */
 function openCall(){
   $("hdr-cad").textContent=active.cadId+" · "+active.type;
+  refreshFireCtrl();
   // restore patient form
   const p=active.patient||{};
   $("p-age").value=p.age||"";$("p-sex").value=p.sex||"";
